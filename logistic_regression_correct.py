@@ -20,7 +20,7 @@ loansData.to_csv('loansData_clean.csv', header=True, index=False)
 
 df = pd.read_csv('loansData_clean.csv')
 
-df['IR_TF'] = df['Interest.Rate'].map(lambda x: 0 if x < 12 else 1)
+df['IR_TF'] = df['Interest.Rate'].map(lambda x: 1 if x < 12 else 0)
 
 #check, should be 1s
 #df[df['Interest.Rate'] == 13].head()
@@ -44,23 +44,23 @@ print(coeff)
 
 #interest_rate = 60.125 - 0.087423*750.00 + 0.000174*10000.00
 
-# p(x) = 1/(1 + e^(60.125 - .087423 * FICO + .000174 * LoanAmount))
+# p(x) = 1/(1 + e^-(60.125 - .087423 * FICO + .000174 * LoanAmount))
 
-prob = 1/(1 + math.exp(60.125 - .087423 * 750 + .000174 * 10000))
+prob = 1/(1 + math.exp(-60.125 +.087423 * 750 - .000174 * 10000))
 
 def logistic_function(FICO, Amount, coeff):
 	p = 1/(1 + math.exp(coeff['intercept'] + coeff['FICO.Score'] * FICO + coeff['Amount.Requested'] * Amount))
 	return p
 
 
-#logistic_function(720,10000,coeff)
-#Out[49]: 0.7463785889515117
+#In [9]: logistic_function(720,10000,coeff)
+#Out[9]: 0.25362141104848557
 
 #logistic_function(750,10000,coeff)
-#Out[48]: 0.9759220629968888
+#Out[10]: 0.024077937003110315
 
 
-#Will obtain loan at both 750 and 720 credit scores
+#p is below .7 for both; unlikely at both 750 and 720 credit scores that the loan will have interest rate < 12%
 
 probs = []
 
