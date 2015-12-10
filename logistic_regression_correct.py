@@ -36,31 +36,33 @@ result = logit.fit()
 coeff = result.params
 print(coeff)
 
-#Amount.Requested     0.000174
-#FICO.Score          -0.087423
-#intercept           60.125045
+#Amount.Requested    -0.000174
+#FICO.Score           0.087423
+#intercept          -60.125045
 
-#interest_rate = 60.125 - 0.087423(FicoScore) + 0.000174(LoanAmount)
+#interest_rate = -60.125045 + 0.087423(FicoScore) - 0.000174(LoanAmount)
 
-#interest_rate = 60.125 - 0.087423*750.00 + 0.000174*10000.00
+#interest_rate = -60.125 + 0.087423*750.00 - 0.000174*10000.00
 
-# p(x) = 1/(1 + e^-(60.125 - .087423 * FICO + .000174 * LoanAmount))
+# p(x) = 1/(1 + e^-(-60.125 + .087423 * FICO - .000174 * LoanAmount))
 
-prob = 1/(1 + math.exp(-60.125 +.087423 * 750 - .000174 * 10000))
+prob = 1/(1 + math.exp(60.125 -.087423 * 750 + .000174 * 10000))
+
+#In [12]: prob
+#Out[12]: 0.9759258979420696
 
 def logistic_function(FICO, Amount, coeff):
-	p = 1/(1 + math.exp(coeff['intercept'] + coeff['FICO.Score'] * FICO + coeff['Amount.Requested'] * Amount))
+	p = 1/(1 + math.exp(-coeff['intercept'] - coeff['FICO.Score'] * FICO - coeff['Amount.Requested'] * Amount))
 	return p
 
 
-#In [9]: logistic_function(720,10000,coeff)
-#Out[9]: 0.25362141104848557
+#In [14]: logistic_function(720,10000,coeff)
+#Out[14]: 0.7463785889515144
 
-#logistic_function(750,10000,coeff)
-#Out[10]: 0.024077937003110315
+#In [15]: logistic_function(750,10000,coeff)
+#Out[15]: 0.9759220629968897
 
-
-#p is below .7 for both; unlikely at both 750 and 720 credit scores that the loan will have interest rate < 12%
+# p is greater than .7 for both, indicating confidence our interest rate will be below 12%
 
 probs = []
 
