@@ -75,3 +75,28 @@ est_debt_interaction =  smf.ols(formula='int_rate ~ home_debt_TF * log_annual_in
 
 est_TF_interaction =  smf.ols(formula='int_rate ~ home_own_TF * log_annual_inc', data=df).fit()
 
+
+import pandas as pd
+import numpy as np
+import statsmodels.api as sm
+
+df = pd.read_csv('/Users/andys/Dropbox (ThinkNear)/Andy S/Sublime Text/DataScience/thinkful/LoanStats3d_2015.csv', index_col=0)
+
+#cleaning
+df = df[1:(len(df)-2)]
+df['int_rate'] = df['int_rate'].map(lambda x: x[:-1]).map(float)
+df = df[df['home_ownership'] !='ANY']
+
+#setting my explanatory and dependent variables
+home_ownership = [4 if x == 'OWN' else 3 if x == 'MORTGAGE' else 2 if x == 'RENT' else 1 if x == 'OTHER' else 0 for x in df['home_ownership']]
+df['home_ownership'] = home_ownership
+
+df['income_and_ownership'] = [ x * y for x, y in zip(df['annual_inc'].tolist(), df['home_ownership'].tolist())]
+y = np.array(df['int_rate'])
+x = df[['annual_inc', 'home_ownership', 'income_and_ownership']]
+X = x.as_matrix()
+
+
+print "USING SM.OLS ANALYSIS\n"
+model = sm.OLS(y, X).fit()
+print model.summary()
